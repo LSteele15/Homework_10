@@ -1,0 +1,114 @@
+{
+    "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
+    "width": 300,
+    "height": 300,
+    "title": "2nd Vaccination % vs Active Cases, by LGA",
+    "data": {
+      "url": "https://raw.githubusercontent.com/LSteele15/Homework_10/main/COVID19%20LGA%20Regional.csv"
+    },
+    "params": [
+      {
+        "name": "Population_Above",
+        "value": 0,
+        "bind": {
+          "input": "range",
+          "min": 0,
+          "max": 200000,
+          "step": 5000,
+          "name": "Minimum Population: "
+        }
+      }
+    ],
+    "transform": [
+      {"filter": "datum.case_rate > 0"},
+      {"filter": "datum.pop > Population_Above"}
+    ],
+    "encoding": {
+      "x": {
+        "field": "Second",
+        "type": "quantitative",
+        "title": "2nd Vaccination %",
+        "scale": {"domain": [35, 75]}
+      },
+      "y": {
+        "field": "case_rate",
+        "type": "quantitative",
+        "title": "Active cases per 100,000",
+        "axis": {"tickCount": 7},
+        "scale": {"type": "log", "domain": [1, 2000]}
+      }
+    },
+    "layer": [
+      {
+        "selection": {
+          "continent_highlight": {
+            "type": "multi",
+            "fields": ["region"],
+            "bind": "legend"
+          }
+        },
+        "mark": "point",
+        "encoding": {
+          "size": {
+            "field": "pop",
+            "title": "Population size",
+            "type": "quantitative",
+            "scale": {
+              "type": "threshold",
+              "domain": [50000, 100000, 150000, 200000],
+              "range": [15, 30, 45, 60, 75]
+            },
+            "legend": {"format": ".2s"}
+          },
+          "color": {
+            "field": "region",
+            "title": "Region",
+            "type": "nominal",
+            "scale": {
+              "domain": [
+                "Regional",
+                "Metro"
+              ],
+              "range": [
+                "#d95f0e",
+                "#2c7fb8"
+              ]
+            }
+          },
+          "opacity": {
+            "condition": {"selection": "continent_highlight", "value": 1},
+            "value": 0.2
+          },
+          "tooltip": [
+            {"field": "LGA", "type": "nominal"},
+            {"field": "active", "title": "Active Cases", "type": "quantitative"},
+            {"field": "pop", "title": "Population size", "type": "quantitative", "format": ","},
+            {"field": "case_rate", "title": "Cases per 100,000", "type": "quantitative", "format": ".2f"},
+            {"field": "Second", "title": "2nd Vaccination %", "type": "quantitative", "format": ".3f"}
+          ]
+        }
+      },
+      {
+        "mark": {
+          "type": "text",
+          "align": "left",
+          "baseline": "line-top",
+          "dx": -20,
+          "dy": 2,
+          "fontSize": 9,
+          "fontStyle": "italic"
+        },
+        "encoding": {
+          "text": {"field": "LGA", "type": "nominal"},
+          "color": {"value": "black"},
+          "opacity": {
+            "condition": {
+              "test": "datum['LGA'] == 'Melbourne' || datum['LGA'] == 'Hume' || datum['LGA'] == 'Surf Coast' || datum['LGA'] == 'Mildura'",
+              "value": 1
+            },
+            "value": 0
+          }
+        }
+      }
+    ]
+  }
